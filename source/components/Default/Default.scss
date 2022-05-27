@@ -1,0 +1,13 @@
+@import "../../styles/mixins";
+
+.block {
+  margin: 100px;
+  display: flex;
+  flex-direction: column;
+  font-size: 30px;
+
+  img {
+    width: 300px;
+    margin-top: 30px;
+  }
+}
