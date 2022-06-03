@@ -16,8 +16,9 @@ export const config = {
   scene: playGame,
   pixelArt: true,
   physics: {
-    default: 'arcade',
-    arcade: {
+    default: 'matter',
+    matter: {
+      debug: true,
       gravity: false,
     },
   },

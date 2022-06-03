@@ -13,11 +13,10 @@ export class playGame extends Phaser.Scene {
     this.load.image('background', BackgroundImg);
   }
   create() {
+    this.matter.world.disableGravity();
     this.add.tileSprite(0, 0, 1920, 1920, 'background');
-    player = this.physics.add.sprite(100, 450, 'dude');
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-    player.body.allowGravity = false;
+    this.add.sprite(150, 450, 'dude')
+    player = this.add.sprite(100, 450, 'dude');
 
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -40,27 +39,23 @@ export class playGame extends Phaser.Scene {
         frameRate: 10,
         repeat: -1
     });
-    // this.world.setBounds(0, 0, 1920, 1920);
-    // this.physics.startSystem(Phaser.Physics.P2JS);
-  console.log(player)
-
   }
 
   update() {
     if (cursors.left.isDown) {
-        player.body.position.x -= 4;
+        player.x -= 4;
         player.anims.play('left', true);
     } else if (cursors.right.isDown) {
-        player.body.position.x += 4;
+        player.x += 4;
         player.anims.play('right', true);
     } else {
         player.anims.play('turn');
     }
     if (cursors.up.isDown) {
-      player.body.position.y -= 4;
+      player.y -= 4;
     }
     if (cursors.down.isDown) {
-      player.body.position.y += 4;
+      player.y += 4;
     }
   }
 }
