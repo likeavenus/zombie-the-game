@@ -10,6 +10,7 @@ export class playGame extends Phaser.Scene {
   }
   preload() {
     this.load.spritesheet('dude', DudeImg, { frameWidth: 32, frameHeight: 48 });
+    this.load.atlas('dude', 'dude.png', 'dude.json');
     this.load.image('background', BackgroundImg);
   }
   create() {
