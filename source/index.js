@@ -19,7 +19,11 @@ export const config = {
     default: 'matter',
     matter: {
       debug: true,
-      gravity: false,
+      gravity: {
+        x: 0,
+        y: 0
+      },
+      setBounds: true
     },
   },
 };
