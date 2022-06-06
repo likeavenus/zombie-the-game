@@ -11,6 +11,8 @@ export class playGame extends Phaser.Scene {
   player;
   bullets;
   keySpace;
+  blocks;
+  direction = 'down';
   constructor() {
     super('PlayGame');
   }
@@ -28,6 +30,11 @@ export class playGame extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'Map' })
 		const tileset = map.addTilesetImage('block', 'block');
 		map.createLayer('Map', tileset);
+
+    this.blocks = map.createFromTiles(1, 0, { key: 'block' })
+      .map((item) => {
+        return this.matter.add.gameObject(item, { isStatic: true })
+      })
 
     this.player = this.matter.add.sprite(100, 450, 'dude', null, {
       // isStatic: true,
@@ -55,7 +62,7 @@ export class playGame extends Phaser.Scene {
     testPlayer.setCollisionCategory(cat1);
     testPlayer2.setCollisionCategory(cat1);
 
-    this.player.setCollidesWith([cat1]);
+    // this.player.setCollidesWith([cat1]);
 
     this.anims.create({
       key: 'left',
@@ -79,20 +86,34 @@ export class playGame extends Phaser.Scene {
 
     this.matter.world.on('collisionstart', function (event) {
       if (event.pairs[0].bodyA.gameObject) {
+
       }
     });
   }
 
   update() {
     if (this.keySpace.isDown) {
-      console.log(this.player)
-      this.bullets = this.matter.add.image(this.player.x, this.player.y, 'bullet');
+      if (this.direction === 'down') {
+        this.bullets = this.matter.add.image(this.player.x, this.player.y + 20, 'bullet').setVelocityY(10);
+      } 
+      if (this.direction === 'up') {
+        this.bullets = this.matter.add.image(this.player.x, this.player.y - 20, 'bullet').setVelocityY(-10);
+      }
+      if (this.direction === 'right') {
+        this.bullets = this.matter.add.image(this.player.x + 20, this.player.y, 'bullet').setVelocityX(10);
+      }
+      if (this.direction === 'left') {
+        this.bullets = this.matter.add.image(this.player.x - 20, this.player.y, 'bullet').setVelocityX(-10);
+      }
+      
     }
     if (this.cursors.left.isDown) {
+      this.direction = 'left';
       this.player.x -= 4;
       // this.player.setVelocity(-4, 0)
       this.player.anims.play('left', true);
     } else if (this.cursors.right.isDown) {
+      this.direction = 'right';
       this.player.x += 4;
       this.player.anims.play('right', true);
     } else {
@@ -100,9 +121,12 @@ export class playGame extends Phaser.Scene {
       // this.player.setVelocity(0, 0)
     }
     if (this.cursors.up.isDown) {
+      this.direction = 'up';
       this.player.y -= 4;
+      // this.player.setVelocity(0, -4);
     }
     if (this.cursors.down.isDown) {
+      this.direction = 'down';
       this.player.y += 4;
     }
   }
