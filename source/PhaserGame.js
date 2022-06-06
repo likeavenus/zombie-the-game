@@ -84,9 +84,9 @@ export class playGame extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.matter.world.on('collisionstart', function (event) {
-      if (event.pairs[0].bodyA.gameObject) {
-
+    this.matter.world.on('collisionstart', (event) => {
+      console.log(event.pairs[0].bodyB.gameObject.texture.key);
+      if (event.pairs[0].bodyB.gameObject.texture.key === 'bullet') {
       }
     });
   }
@@ -94,16 +94,16 @@ export class playGame extends Phaser.Scene {
   update() {
     if (this.keySpace.isDown) {
       if (this.direction === 'down') {
-        this.bullets = this.matter.add.image(this.player.x, this.player.y + 20, 'bullet').setVelocityY(10);
+        this.bullets = this.matter.add.image(this.player.x, this.player.y + 25, 'bullet', null, { circleRadius: 6 }).setVelocityY(10);
       } 
       if (this.direction === 'up') {
-        this.bullets = this.matter.add.image(this.player.x, this.player.y - 20, 'bullet').setVelocityY(-10);
+        this.bullets = this.matter.add.image(this.player.x, this.player.y - 25, 'bullet', null, { circleRadius: 6 }).setVelocityY(-10);
       }
       if (this.direction === 'right') {
-        this.bullets = this.matter.add.image(this.player.x + 20, this.player.y, 'bullet').setVelocityX(10);
+        this.bullets = this.matter.add.image(this.player.x + 25, this.player.y, 'bullet', null, { circleRadius: 6 }).setVelocityX(10);
       }
       if (this.direction === 'left') {
-        this.bullets = this.matter.add.image(this.player.x - 20, this.player.y, 'bullet').setVelocityX(-10);
+        this.bullets = this.matter.add.image(this.player.x - 25, this.player.y, 'bullet', null, { circleRadius: 6 }).setVelocityX(-10);
       }
       
     }
