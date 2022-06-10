@@ -6,27 +6,10 @@ import './styles/global.scss';
 import App from './components/App';
 import { playGame } from './PhaserGame';
 import Phaser from 'phaser';
+import { config } from './PhaserGame';
 
 
-export const config = {
-  type: Phaser.AUTO,
-  parent: 'phaser',
-  width: 800,
-  height: 600,
-  scene: playGame,
-  pixelArt: true,
-  physics: {
-    default: 'matter',
-    matter: {
-      debug: true,
-      gravity: {
-        x: 0,
-        y: 0
-      },
-      setBounds: true
-    },
-  },
-};
+
 const game = new Phaser.Game(config);
 
 const Root = () => {
