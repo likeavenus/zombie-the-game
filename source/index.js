@@ -4,9 +4,8 @@ import store from './store';
 import { Provider } from 'react-redux';
 import './styles/global.scss';
 import App from './components/App';
-import { playGame } from './PhaserGame';
 import Phaser from 'phaser';
-import { config } from './PhaserGame';
+import { config } from './constants';
 
 
 
@@ -23,4 +22,4 @@ const Root = () => {
 render(
     <Root/>,
     document.getElementById('root')
-)
+);
