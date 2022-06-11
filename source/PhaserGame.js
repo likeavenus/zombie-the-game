@@ -1,6 +1,4 @@
 import Phaser from 'phaser';
-import FaunaJson from './components/App/assets/characters/fauna.json';
-import FaunaPng from './components/App/assets/characters/fauna.png';
 import { debugDraw } from './utils/debug';
 
 export default class PlayGame extends Phaser.Scene {
@@ -9,7 +7,6 @@ export default class PlayGame extends Phaser.Scene {
   }
 
   preload() {
-    this.load.atlas('fauna', FaunaPng, FaunaJson);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.fauna;
   }
@@ -82,6 +79,33 @@ export default class PlayGame extends Phaser.Scene {
 
     this.physics.add.collider(this.fauna, wallsLayer);
     this.fauna.anims.play('fauna-idle-down');
+
+    const lizard = this.physics.add.sprite(50, 50, 'lizard', 'lizard_m_idle_anim_f0.png');
+
+    this.anims.create({
+        key: 'lizard-idle',
+        frames: this.anims.generateFrameNames('lizard', {
+            start: 0,
+            end: 3,
+            prefix: 'lizard_m_idle_anim_f',
+            suffix: '.png',
+        }),
+        repeat: -1,
+        frameRate: 10,
+    });
+
+    this.anims.create({
+        key: 'lizard-run',
+        frames: this.anims.generateFrameNames('lizard', {
+            start: 0,
+            end: 3,
+            prefix: 'lizard_m_run_anim_f',
+            suffix: '.png',
+        }),
+        repeat: -1,
+        frameRate: 10,
+    });
+    lizard.anims.play('lizard-run');
   }
 
   update() {
