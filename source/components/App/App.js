@@ -3,18 +3,16 @@ import styles from './App.scss';
 import { createBrowserHistory } from 'history';
 import { Router, Route, Switch } from 'react-router-dom';
 const history = createBrowserHistory();
-import Game from '../Game';
 import ScrollToTop from 'react-router-scroll-top';
 
 export default function App(props) {
+
     return (
         <div className={styles.app}>
             <Router history={history}>
                 <ScrollToTop>
                     <Switch>
-                        <Route exact path='/'>
-                            <Game/>
-                        </Route>
+                        <Route exact path='/'></Route>
                     </Switch>
                 </ScrollToTop>
             </Router>

@@ -1,9 +1,14 @@
 import Phaser from 'phaser';
 import { debugDraw } from './utils/debug';
+import { createLizardAnims } from './components/App/anims/EnemyAnims';
+import { characterAnims } from './components/App/anims/CharacterAnims';
+import Lizard from './components/App/enemies/Lizard';
 
 export default class PlayGame extends Phaser.Scene {
+  cursors;
+  hit = 0;
   constructor() {
-    super('playGame');
+    super('PlayGame');
   }
 
   preload() {
@@ -11,7 +16,8 @@ export default class PlayGame extends Phaser.Scene {
     this.fauna;
   }
   create() {
-
+    characterAnims(this.anims);
+    createLizardAnims(this.anims);
     const map = this.make.tilemap({ key: 'dungeon' });
     const tileset = map.addTilesetImage('dungeon', 'tiles', 16, 16, 1, 2);
 
@@ -25,90 +31,40 @@ export default class PlayGame extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.fauna, true);
 
-    this.anims.create({
-        key: 'fauna-idle-down',
-        frames: [{ key: 'fauna', frame: 'walk-down-3.png' }]
-    });
-
-    this.anims.create({
-        key: 'fauna-idle-up',
-        frames: [{ key: 'fauna', frame: 'walk-up-3.png' }]
-    });
-
-    this.anims.create({
-        key: 'fauna-idle-side',
-        frames: [{ key: 'fauna', frame: 'walk-side-3.png' }]
-    });
-
-
-    this.anims.create({
-        key: 'fauna-run-down',
-        frames: this.anims.generateFrameNames('fauna', {
-            start: 1,
-            end: 8,
-            prefix: 'run-down-',
-            suffix: '.png',
-        }),
-        repeat: -1,
-        frameRate: 16,
-    });
-
-    this.anims.create({
-        key: 'fauna-run-up',
-        frames: this.anims.generateFrameNames('fauna', {
-            start: 1,
-            end: 8,
-            prefix: 'run-up-',
-            suffix: '.png',
-        }),
-        repeat: -1,
-        frameRate: 16,
-    });
-
-    this.anims.create({
-        key: 'fauna-run-side',
-        frames: this.anims.generateFrameNames('fauna', {
-            start: 1,
-            end: 8,
-            prefix: 'run-side-',
-            suffix: '.png',
-        }),
-        repeat: -1,
-        frameRate: 16,
-    });
-
-    this.physics.add.collider(this.fauna, wallsLayer);
     this.fauna.anims.play('fauna-idle-down');
 
-    const lizard = this.physics.add.sprite(50, 50, 'lizard', 'lizard_m_idle_anim_f0.png');
+    const lizards = this.physics.add.group({
+        classType: Lizard,
+        createCallback: (go) => {
+          const lizGo = go;
+          lizGo.body.onCollide = true;
+        }
+    })
+    lizards.get(256, 128, 'lizard');
+    this.physics.add.collider(this.fauna, wallsLayer);
+    this.physics.add.collider(lizards, wallsLayer);
+    this.physics.add.collider(lizards, this.fauna, this.handlePlayerLizardCollision, undefined, this);
+  }
 
-    this.anims.create({
-        key: 'lizard-idle',
-        frames: this.anims.generateFrameNames('lizard', {
-            start: 0,
-            end: 3,
-            prefix: 'lizard_m_idle_anim_f',
-            suffix: '.png',
-        }),
-        repeat: -1,
-        frameRate: 10,
-    });
+  handlePlayerLizardCollision(obj1, obj2) {
+    const lizard = obj2;
+    const dx = this.fauna.x - lizard.x;
+    const dy = this.fauna.y - lizard.y;
+    const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(200);
 
-    this.anims.create({
-        key: 'lizard-run',
-        frames: this.anims.generateFrameNames('lizard', {
-            start: 0,
-            end: 3,
-            prefix: 'lizard_m_run_anim_f',
-            suffix: '.png',
-        }),
-        repeat: -1,
-        frameRate: 10,
-    });
-    lizard.anims.play('lizard-run');
+    this.fauna.setVelocity(dir.x, dir.y);
+
+    this.hit = 1;
   }
 
   update() {
+    if (this.hit > 0) {
+      ++this.hit;
+      if (this.hit > 10) {
+        this.hit = 0;
+      }
+      return;
+    }
     const speed = 100;
     if (!this.cursors || !this.fauna) {
       return;
