@@ -1,0 +1,28 @@
+@import "../../styles/mixins";
+
+.StartPage {
+  display: block;
+  background-color: black;
+  color: white;
+  min-height: 100vh;
+  padding: 40px;
+
+  h1 {
+    font-size: 40px;
+  }
+
+  h2 {
+    font-size: 30px;
+  }
+
+  a {
+    color: yellow;
+    text-decoration: underline;
+    font-size: 25px;
+    cursor: pointer !important;
+
+    &:hover {
+      opacity: 0.5;
+    }
+  }
+}

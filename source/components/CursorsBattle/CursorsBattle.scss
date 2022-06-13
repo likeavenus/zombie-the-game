@@ -1,0 +1,15 @@
+@import "../../styles/mixins";
+
+.CursorsBattle {
+  display: block;
+  background-color: black;
+  color: white;
+  min-height: 100vh;
+  padding: 40px;
+}
+
+.CursorsBattle__field {
+  height: 500px;
+  width: 800px;
+  background-color: #fff;
+}
