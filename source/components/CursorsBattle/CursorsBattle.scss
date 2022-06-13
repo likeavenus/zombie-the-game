@@ -1,6 +1,6 @@
 @import "../../styles/mixins";
 
-.CursorsBattle {
+.wrapper {
   display: block;
   background-color: black;
   color: white;
@@ -8,8 +8,21 @@
   padding: 40px;
 }
 
-.CursorsBattle__field {
+.field {
   height: 500px;
   width: 800px;
   background-color: #fff;
+  position: relative;
+
+
+}
+
+.cursor {
+  display: block;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  background-image: url('./assets/cursor.png');
+  background-repeat: no-repeat;
+  background-size: contain;
 }
