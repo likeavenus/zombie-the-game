@@ -6,6 +6,7 @@ import FaunaJson from './assets/characters/fauna.json';
 import FaunaPng from './assets/characters/fauna.png';
 import LizardPng from './assets/enemies/lizard.png';
 import LizardJson from './assets/enemies/lizard.json';
+import HurtSound from './assets/hurt-sound.mp3';
 export default class Preloader extends Phaser.Scene {
     constructor() {
         super('preloader');
@@ -16,6 +17,7 @@ export default class Preloader extends Phaser.Scene {
         this.load.tilemapTiledJSON('dungeon', DungeonJson);
         this.load.atlas('fauna', FaunaPng, FaunaJson);
         this.load.atlas('lizard', LizardPng, LizardJson);
+        this.load.audio('hurt', HurtSound);
     }
 
     create() {

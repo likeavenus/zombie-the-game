@@ -28,8 +28,7 @@ module.exports = {
             ],
         }),
         new HtmlWebpackPlugin({
-            title: 'New Project',
-            favicon: paths.public + '/favicon.ico',
+            title: 'Phaser Game',
             template: paths.src + '/markup/index.html', // template file
             filename: 'index.html', // output file
         }),

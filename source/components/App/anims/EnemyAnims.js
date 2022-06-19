@@ -1,3 +1,4 @@
+/** анимации противника */
 export const createLizardAnims = (anims) => {
     anims.create({
         key: 'lizard-idle',

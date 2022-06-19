@@ -1,3 +1,4 @@
+/** анимации игрока */
 export const characterAnims = (anims) => {
     anims.create({
         key: 'fauna-idle-down',

@@ -3,10 +3,14 @@ import { debugDraw } from './utils/debug';
 import { createLizardAnims } from './components/App/anims/EnemyAnims';
 import { characterAnims } from './components/App/anims/CharacterAnims';
 import Lizard from './components/App/enemies/Lizard';
+import { getRandomIntFromRange } from './utils/utils';
+
+import './components/App/characters/Fauna';
 
 export default class PlayGame extends Phaser.Scene {
   cursors;
   hit = 0;
+  hurtSound;
   constructor() {
     super('PlayGame');
   }
@@ -20,18 +24,22 @@ export default class PlayGame extends Phaser.Scene {
     createLizardAnims(this.anims);
     const map = this.make.tilemap({ key: 'dungeon' });
     const tileset = map.addTilesetImage('dungeon', 'tiles', 16, 16, 1, 2);
+    const soundManager = new Phaser.Sound.WebAudioSoundManager(this.game);
+    this.hurtSound = new Phaser.Sound.WebAudioSound(soundManager, 'hurt');
 
     map.createLayer('Ground', tileset);
     const wallsLayer = map.createLayer('Walls', tileset);
     wallsLayer.setCollisionByProperty({ collides: true });
     // debugDraw(wallsLayer, this);
 
-    this.fauna = this.physics.add.sprite(128, 128, 'fauna', 'walk-down-3.png');
-    this.fauna.body.setSize(this.fauna.width * 0.5, this.fauna.height * 0.8);
+    this.fauna = this.add.fauna(128, 128, 'fauna');
+
+    // this.fauna = this.physics.add.sprite(128, 128, 'fauna', 'walk-down-3.png');
+    // this.fauna.body.setSize(this.fauna.width * 0.5, this.fauna.height * 0.8);
+    // this.fauna.anims.play('fauna-idle-down');
 
     this.cameras.main.startFollow(this.fauna, true);
 
-    this.fauna.anims.play('fauna-idle-down');
 
     const lizards = this.physics.add.group({
         classType: Lizard,
@@ -40,61 +48,28 @@ export default class PlayGame extends Phaser.Scene {
           lizGo.body.onCollide = true;
         }
     })
-    lizards.get(256, 128, 'lizard');
+    lizards.get(226, 128, 'lizard');
     this.physics.add.collider(this.fauna, wallsLayer);
     this.physics.add.collider(lizards, wallsLayer);
     this.physics.add.collider(lizards, this.fauna, this.handlePlayerLizardCollision, undefined, this);
   }
 
-  handlePlayerLizardCollision(obj1, obj2) {
+  handlePlayerLizardCollision(_, obj2) {
+    const random = getRandomIntFromRange(0, 500);
+    this.hurtSound.setDetune(random);
+    this.hurtSound.play();
+    // this.sound.play('hurt');
     const lizard = obj2;
     const dx = this.fauna.x - lizard.x;
     const dy = this.fauna.y - lizard.y;
-    const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(200);
-
-    this.fauna.setVelocity(dir.x, dir.y);
-
-    this.hit = 1;
+    /** рассчитываем в какую сторону будет отскок от врага при столкновении */
+    const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(220);
+    this.fauna.handleDamage(dir);
   }
 
   update() {
-    if (this.hit > 0) {
-      ++this.hit;
-      if (this.hit > 10) {
-        this.hit = 0;
-      }
-      return;
-    }
-    const speed = 100;
-    if (!this.cursors || !this.fauna) {
-      return;
-    }
-
-    if (this.cursors.left.isDown) {
-        this.fauna.setVelocityX(-speed);
-        this.fauna.anims.play('fauna-run-side', true);
-
-        this.fauna.scaleX = -1;
-        this.fauna.body.offset.x = 24;
-
-    } else if (this.cursors.right.isDown) {
-        this.fauna.setVelocityX(speed);
-        this.fauna.anims.play('fauna-run-side', true);
-        this.fauna.body.offset.x = 8;
-        this.fauna.scaleX = 1;
-
-    } else if (this.cursors.up.isDown) {
-        this.fauna.setVelocityY(-speed);
-        this.fauna.anims.play('fauna-run-up', true);
-        
-    } else if (this.cursors.down.isDown) {
-        this.fauna.setVelocityY(speed);
-        this.fauna.anims.play('fauna-run-down', true);
-    } else {
-        const parts = this.fauna.anims?.currentAnim?.key.split('-');
-        parts[1] = 'idle';
-        this.fauna.play(parts.join('-'));
-        this.fauna.setVelocity(0, 0);
+    if (this.fauna) {
+      this.fauna.update(this.cursors);
     }
   }
 }
