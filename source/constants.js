@@ -1,18 +1,19 @@
 import Phaser from 'phaser';
 import Preloader from './components/App/Preloader';
 import PlayGame from './PhaserGame';
+import GameUI from './GameUI';
 
 export const config = {
   type: Phaser.AUTO,
   parent: 'phaser',
   width: 400,
   height: 250,
-  scene: [Preloader, PlayGame],
+  scene: [Preloader, PlayGame, GameUI],
   pixelArt: true,
   physics: {
     default: 'arcade',
     arcade: {
-      debug: true,
+      // debug: true,
       gravity: { y: 0, x: 0 }
     },
   },

@@ -15,7 +15,6 @@ export const characterAnims = (anims) => {
         frames: [{ key: 'fauna', frame: 'walk-side-3.png' }]
     });
 
-
     anims.create({
         key: 'fauna-run-down',
         frames: anims.generateFrameNames('fauna', {
@@ -51,4 +50,15 @@ export const characterAnims = (anims) => {
         repeat: -1,
         frameRate: 16,
     });
+
+    anims.create({
+        key: 'fauna-faint',
+        frames: anims.generateFrameNames('fauna', {
+            start: 1,
+            end: 4,
+            prefix: 'faint-',
+            suffix: '.png',
+        }),
+        frameRate: 15,
+    })
 }
