@@ -12,6 +12,10 @@ export default class PlayGame extends Phaser.Scene {
   cursors;
   hit = 0;
   hurtSound;
+  playerLizardsCollider;
+  knives;
+  lizards;
+
   constructor() {
     super('PlayGame');
   }
@@ -39,8 +43,13 @@ export default class PlayGame extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.fauna, true);
 
+    this.knives = this.physics.add.group({
+      classType: Phaser.Physics.Arcade.Image
+    });
 
-    const lizards = this.physics.add.group({
+    this.fauna.setKnives(this.knives);
+
+    this.lizards = this.physics.add.group({
         classType: Lizard,
         createCallback: (go) => {
           const lizGo = go;
@@ -48,10 +57,22 @@ export default class PlayGame extends Phaser.Scene {
         }
     });
 
-    lizards.get(226, 128, 'lizard');
+    this.lizards.get(226, 128, 'lizard');
     this.physics.add.collider(this.fauna, wallsLayer, this.handlePlayerWallsColision, undefined, this);
-    this.physics.add.collider(lizards, wallsLayer);
-    this.physics.add.collider(lizards, this.fauna, this.handlePlayerLizardCollision, undefined, this);
+    this.physics.add.collider(this.lizards, wallsLayer);
+    this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
+    this.physics.add.collider(this.knives, this.lizards, this.handleKnifeLizardCollision, undefined, this);
+
+    this.playerLizardsCollider = this.physics.add.collider(this.lizards, this.fauna, this.handlePlayerLizardCollision, undefined, this);
+  }
+
+  handleKnifeLizardCollision(obj1, obj2) {
+    this.knives.killAndHide(obj1);
+		this.lizards.killAndHide(obj2);
+  }
+
+  handleKnifeWallCollision(obj1) {
+    this.knives.killAndHide(obj1);
   }
 
   handlePlayerWallsColision() {
@@ -70,10 +91,14 @@ export default class PlayGame extends Phaser.Scene {
     const dx = this.fauna.x - lizard.x;
     const dy = this.fauna.y - lizard.y;
     /** рассчитываем в какую сторону будет отскок от врага при столкновении */
-    const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(220);
+    const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(180);
     this.fauna.handleDamage(dir);
 
     sceneEvents.emit('player-health-changed', this.fauna.health);
+
+    if (this.fauna.health <= 0) {
+      this.playerLizardsCollider.destroy();
+    }
   }
 
   update() {

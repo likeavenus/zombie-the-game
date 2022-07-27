@@ -9,20 +9,22 @@ const HealthState = {
 export default class Fauna extends Phaser.Physics.Arcade.Sprite {
     healthState = HealthState.IDLE;
     damageTime = 0;
+    knives;
+    
     _health = 3;
     constructor(scene, x, y, texture, frame) {
         super(scene, x, y, texture, frame);
 
         this.anims.play('fauna-idle-down');
-
     }
+
+    setKnives(knives) {
+        this.knives = knives;
+    }
+
 
     get health() {
         return this._health;
-    }
-
-    set health(value) {
-
     }
 
     preUpdate(t, dt) {
@@ -45,10 +47,10 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
     }
 
     handleDamage(dir) {
-        if (this._health <= 0) {
-            // die
-            return;
-        }
+        // if (this._health <= 0) {
+        //     console.log(this)
+        //     return;
+        // }
         if (this.healthState === HealthState.DAMAGE) {
             return;
         }
@@ -59,6 +61,7 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
         if (this._health <= 0) {
             this.healthState = HealthState.DEAD;
             this.anims.play('fauna-faint');
+            this.setVelocity(0, 0);
         } else {
             this.setVelocity(dir.x, dir.y);
 
@@ -68,12 +71,55 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    throwKnife() {
+        if (!this.knives) {
+            return;
+        }
+        const parts = this.anims.currentAnim.key.split('-');
+        const direction = parts[2];
+        const vec = new Phaser.Math.Vector2(0, 0);
+        switch(direction) {
+            case 'up':
+                vec.y = -1;
+                break;
+            case 'down':
+                vec.y = 1;
+                break;
+            default:
+            case 'side':
+                if (this.scaleX < 0) {
+                    vec.x = -1;
+                } else {
+                    vec.x = 1;
+                }
+                break;
+        }
+        const angle = vec.angle();
+        const knife = this.knives.get(this.x, this.y, 'knife');
+        console.log(angle)
+
+        knife.setActive(true);
+        knife.setVisible(true);
+
+        knife.setRotation(angle);
+        knife.x += vec.x * 16;
+        knife.y += vec.y * 16;
+        knife.setVelocity(vec.x * 300, vec.y * 300);
+    }
+
+
+
     update(cursors) {
         if (this.healthState === HealthState.DAMAGE || this.healthState === HealthState.DEAD) {
             return;
         }
         const speed = 100;
         if (!cursors) {
+            return;
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
+            this.throwKnife();
             return;
         }
 

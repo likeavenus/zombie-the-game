@@ -22,8 +22,8 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, frame) {
         super(scene, x, y, texture, frame);
         this.anims.play('lizard-idle');
+        
         scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.handleTileCollision, this);
-
         this.moveEvent = scene.time.addEvent({
             delay: 2000,
             callback: () => {
@@ -32,6 +32,7 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
             loop: true,
         })
     }
+
 
     destroy(fromScene) {
         this.moveEvent.destroy();
@@ -57,9 +58,13 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
                 break;
             case Direction.RIGHT:
                 this.setVelocity(speed, 0);
+                this.scaleX = 1;
+                this.body.offset.x = 0;
                 break;
             case Direction.LEFT:
                 this.setVelocity(-speed, 0);
+                this.scaleX = -1;
+                this.body.offset.x = 16;
                 break;
         }
     }

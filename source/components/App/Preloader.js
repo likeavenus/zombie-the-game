@@ -9,6 +9,7 @@ import LizardJson from './assets/enemies/lizard.json';
 import HurtSound from './assets/hurt-sound.mp3';
 import HeartEmpty from './assets/ui/ui_heart_empty.png';
 import HeartFull from './assets/ui/ui_heart_full.png';
+import KnifeImg from './assets/weapons/weapon_knife.png';
 
 export default class Preloader extends Phaser.Scene {
     constructor() {
@@ -23,6 +24,7 @@ export default class Preloader extends Phaser.Scene {
         this.load.audio('hurt', HurtSound);
         this.load.image('heart-full', HeartFull);
         this.load.image('heart-empty', HeartEmpty);
+        this.load.image('knife', KnifeImg);
     }
 
     create() {
