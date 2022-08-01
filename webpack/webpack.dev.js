@@ -1,13 +1,22 @@
 const { merge } = require('webpack-merge')
 const common = require('./webpack.common')
 const paths = require('./paths')
-const autoprefixer = require("autoprefixer");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const autoprefixer = require('autoprefixer');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = merge(common, {
     mode: 'development',
     devtool: 'inline-source-map',
     devServer: {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+        },
+        proxy: {
+            '/socket': 'http://localhost:3000',
+            ws: true,
+        },
         compress: true,
         port: 3000,
         open: true,
@@ -38,9 +47,9 @@ module.exports = merge(common, {
             {
                 test: /\.(css)$/,
                 use: [
-                    "style-loader",
+                    'style-loader',
                     {
-                        loader: "css-loader",
+                        loader: 'css-loader',
                         options: {
                             importLoaders: 1,
                         },
@@ -59,9 +68,9 @@ module.exports = merge(common, {
             {
                 test: /\.(scss|sass)$/,
                 use: [
-                    "style-loader",
+                    'style-loader',
                     {
-                        loader: "css-loader",
+                        loader: 'css-loader',
                         options: {
                             importLoaders: 2,
                             modules: {

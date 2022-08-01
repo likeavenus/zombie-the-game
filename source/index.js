@@ -7,8 +7,6 @@ import App from './components/App';
 import Phaser from 'phaser';
 import { config } from './constants';
 
-
-
 const game = new Phaser.Game(config);
 
 const Root = () => {

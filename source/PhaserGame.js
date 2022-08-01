@@ -5,8 +5,12 @@ import { characterAnims } from './components/App/anims/CharacterAnims';
 import Lizard from './components/App/enemies/Lizard';
 import { getRandomIntFromRange } from './utils/utils';
 import { sceneEvents } from './components/App/events/EventCenter';
-
+import { io } from 'socket.io-client';
 import './components/App/characters/Fauna';
+
+function addPlayer(self, playerInfo) {
+  self.fauna = self.add.fauna(128, 128, 'fauna');
+}
 
 export default class PlayGame extends Phaser.Scene {
   cursors;
@@ -26,6 +30,11 @@ export default class PlayGame extends Phaser.Scene {
   }
   create() {
     this.scene.run('game-ui');
+    this.socket = io();
+
+    this.socket.on('connect', () => {
+      console.log(this.socket.id)
+    });
 
     characterAnims(this.anims);
     createLizardAnims(this.anims);
@@ -54,10 +63,13 @@ export default class PlayGame extends Phaser.Scene {
         createCallback: (go) => {
           const lizGo = go;
           lizGo.body.onCollide = true;
-        }
+        },
     });
 
     this.lizards.get(226, 128, 'lizard');
+    this.lizards.get(226, 108, 'lizard');
+    this.lizards.get(216, 108, 'lizard');
+    this.lizards.get(206, 128, 'lizard');
     this.physics.add.collider(this.fauna, wallsLayer, this.handlePlayerWallsColision, undefined, this);
     this.physics.add.collider(this.lizards, wallsLayer);
     this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
