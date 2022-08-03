@@ -8,8 +8,24 @@ import { sceneEvents } from './components/App/events/EventCenter';
 import { io } from 'socket.io-client';
 import './components/App/characters/Fauna';
 
-function addPlayer(self, playerInfo) {
-  self.fauna = self.add.fauna(128, 128, 'fauna');
+// const socket = io();
+
+function addPlayer(self, playerInfo, wallsLayer) {
+  self.fauna = self.add.fauna(playerInfo.x, playerInfo.y, 'fauna');
+  self.cameras.main.startFollow(self.fauna, true);
+  self.fauna.setKnives(self.knives);
+  self.fauna.playerId = playerInfo.playerId;
+  self.physics.add.collider(self.fauna, wallsLayer, self.handlePlayerWallsColision, undefined, self);
+  self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
+  return self.fauna;
+}
+
+function addOtherPlayers(self, playerInfo, wallsLayer) {
+  const otherPlayer = self.add.fauna(playerInfo.x, playerInfo.y, 'fauna');
+  self.physics.add.collider(otherPlayer, wallsLayer, self.handlePlayerWallsColision, undefined, self);
+  self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
+  otherPlayer.playerId = playerInfo.playerId;
+  self.otherPlayers = self.otherPlayers.add(otherPlayer);
 }
 
 export default class PlayGame extends Phaser.Scene {
@@ -26,37 +42,70 @@ export default class PlayGame extends Phaser.Scene {
 
   preload() {
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.fauna;
   }
   create() {
     this.scene.run('game-ui');
-    this.socket = io();
+    const map = this.make.tilemap({ key: 'dungeon' });
+    const tileset = map.addTilesetImage('dungeon', 'tiles', 16, 16, 1, 2);
+    const wallsLayer = map.createLayer('Walls', tileset);
+    wallsLayer.setCollisionByProperty({ collides: true });
+    this.otherPlayers = this.physics.add.group();
 
-    this.socket.on('connect', () => {
-      console.log(this.socket.id)
+    this.socket = io();
+    // this.socket.on('connect', () => {
+    //   console.log('Connected: ', this.socket.id)
+    // });
+    this.socket.on('current_players', (players) => {
+      Object.keys(players).forEach((id) => {
+        if (players[id].playerId === this.socket.id) {
+          addPlayer(this, players[id], wallsLayer);
+        } else {
+          addOtherPlayers(this, players[id], wallsLayer);
+        }
+      });
     });
+
+    this.socket.on('new_player', (playerInfo) => {
+      addOtherPlayers(this, playerInfo, wallsLayer);
+    });
+    this.socket.on('remove_player', (playerId) => {
+      this.otherPlayers.getChildren().forEach((otherPlayer) => {
+        if (playerId === otherPlayer.playerId) {
+          otherPlayer.destroy();
+        }
+      });
+    });
+
+
+    this.socket.on('update_positions', (player) => {
+      this.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (player.playerId === otherPlayer.playerId) {
+          console.log('player: ', player)
+          otherPlayer.x = player.x;
+          otherPlayer.y = player.y;
+          otherPlayer.scaleX = player.scaleX;
+          console.log('otherPlayer: ', otherPlayer)
+          otherPlayer.anims.play(player.animationKey, true);
+        }
+      });
+    })
 
     characterAnims(this.anims);
     createLizardAnims(this.anims);
-    const map = this.make.tilemap({ key: 'dungeon' });
-    const tileset = map.addTilesetImage('dungeon', 'tiles', 16, 16, 1, 2);
+
     const soundManager = new Phaser.Sound.WebAudioSoundManager(this.game);
     this.hurtSound = new Phaser.Sound.WebAudioSound(soundManager, 'hurt');
 
     map.createLayer('Ground', tileset);
-    const wallsLayer = map.createLayer('Walls', tileset);
-    wallsLayer.setCollisionByProperty({ collides: true });
+
     // debugDraw(wallsLayer, this);
 
-    this.fauna = this.add.fauna(128, 128, 'fauna');
 
-    this.cameras.main.startFollow(this.fauna, true);
 
     this.knives = this.physics.add.group({
       classType: Phaser.Physics.Arcade.Image
     });
 
-    this.fauna.setKnives(this.knives);
 
     this.lizards = this.physics.add.group({
         classType: Lizard,
@@ -66,16 +115,11 @@ export default class PlayGame extends Phaser.Scene {
         },
     });
 
-    this.lizards.get(226, 128, 'lizard');
-    this.lizards.get(226, 108, 'lizard');
-    this.lizards.get(216, 108, 'lizard');
-    this.lizards.get(206, 128, 'lizard');
-    this.physics.add.collider(this.fauna, wallsLayer, this.handlePlayerWallsColision, undefined, this);
+    // this.lizards.get(226, 128, 'lizard');
     this.physics.add.collider(this.lizards, wallsLayer);
     this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
     this.physics.add.collider(this.knives, this.lizards, this.handleKnifeLizardCollision, undefined, this);
 
-    this.playerLizardsCollider = this.physics.add.collider(this.lizards, this.fauna, this.handlePlayerLizardCollision, undefined, this);
   }
 
   handleKnifeLizardCollision(obj1, obj2) {
@@ -115,7 +159,7 @@ export default class PlayGame extends Phaser.Scene {
 
   update() {
     if (this.fauna) {
-      this.fauna.update(this.cursors);
+      this.fauna.update(this.cursors, this.socket);
     }
   }
 }

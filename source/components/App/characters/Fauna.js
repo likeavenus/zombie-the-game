@@ -96,7 +96,6 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
         }
         const angle = vec.angle();
         const knife = this.knives.get(this.x, this.y, 'knife');
-        console.log(angle)
 
         knife.setActive(true);
         knife.setVisible(true);
@@ -109,7 +108,7 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
 
 
 
-    update(cursors) {
+    update(cursors, socket) {
         if (this.healthState === HealthState.DAMAGE || this.healthState === HealthState.DEAD) {
             return;
         }
@@ -126,28 +125,62 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
         if (cursors.left.isDown) {
             this.setVelocity(-speed, 0);
             this.anims.play('fauna-run-side', true);
-
             this.scaleX = -1;
             this.body.offset.x = 24;
+            socket.emit('player_moved', {
+                x: this.x,
+                y: this.y,
+                scaleX: this.scaleX,
+                playerId: this.playerId,
+                animationKey: 'fauna-run-side',
+            });
 
         } else if (cursors.right.isDown) {
             this.setVelocity(speed, 0);
             this.anims.play('fauna-run-side', true);
             this.body.offset.x = 8;
             this.scaleX = 1;
+            socket.emit('player_moved', {
+                x: this.x,
+                y: this.y,
+                scaleX: this.scaleX,
+                playerId: this.playerId,
+                animationKey: 'fauna-run-side',
+            })
 
         } else if (cursors.up.isDown) {
             this.setVelocity(0, -speed);
             this.anims.play('fauna-run-up', true);
+            socket.emit('player_moved', {
+                x: this.x,
+                y: this.y,
+                scaleX: this.scaleX,
+                playerId: this.playerId,
+                animationKey: 'fauna-run-up',
+            })
 
         } else if (cursors.down.isDown) {
             this.setVelocity(0, speed);
             this.anims.play('fauna-run-down', true);
+            socket.emit('player_moved', {
+                x: this.x,
+                y: this.y,
+                scaleX: this.scaleX,
+                playerId: this.playerId,
+                animationKey: 'fauna-run-down',
+            })
         } else {
             const parts = this.anims.currentAnim.key.split('-');
             parts[1] = 'idle';
             this.anims.play(parts.join('-'));
             this.setVelocity(0, 0);
+
+            // socket.emit('player_moved', {
+            //     x: this.x,
+            //     y: this.y,
+            //     scaleX: 1,
+            //     playerId: this.playerId
+            // })
         }
     }
 }
