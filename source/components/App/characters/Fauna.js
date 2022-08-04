@@ -130,7 +130,9 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
             socket.emit('player_moved', {
                 x: this.x,
                 y: this.y,
-                scaleX: this.scaleX,
+                velocity: this.body.velocity,
+                // scaleX: this.scaleX,
+                // offsetX: this.body.offset.x,
                 playerId: this.playerId,
                 animationKey: 'fauna-run-side',
             });
@@ -143,7 +145,9 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
             socket.emit('player_moved', {
                 x: this.x,
                 y: this.y,
-                scaleX: this.scaleX,
+                velocity: this.body.velocity,
+                // scaleX: this.scaleX,
+                // offsetX: this.body.offset.x,
                 playerId: this.playerId,
                 animationKey: 'fauna-run-side',
             })
@@ -154,7 +158,9 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
             socket.emit('player_moved', {
                 x: this.x,
                 y: this.y,
-                scaleX: this.scaleX,
+                velocity: this.body.velocity,
+                // scaleX: this.scaleX,
+                // offsetX: this.body.offset.x,
                 playerId: this.playerId,
                 animationKey: 'fauna-run-up',
             })
@@ -165,7 +171,9 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
             socket.emit('player_moved', {
                 x: this.x,
                 y: this.y,
-                scaleX: this.scaleX,
+                velocity: this.body.velocity,
+                // scaleX: this.scaleX,
+                // offsetX: this.body.offset.x,
                 playerId: this.playerId,
                 animationKey: 'fauna-run-down',
             })
@@ -174,13 +182,16 @@ export default class Fauna extends Phaser.Physics.Arcade.Sprite {
             parts[1] = 'idle';
             this.anims.play(parts.join('-'));
             this.setVelocity(0, 0);
-
-            // socket.emit('player_moved', {
-            //     x: this.x,
-            //     y: this.y,
-            //     scaleX: 1,
-            //     playerId: this.playerId
-            // })
+            // console.log(this.body.offset.x)
+            socket.emit('player_moved', {
+                x: this.x,
+                y: this.y,
+                velocity: this.body.velocity,
+                // scaleX: this.scaleX,
+                // offsetX: this.body.offset.x,
+                playerId: this.playerId,
+                animationKey: parts.join('-'),
+            })
         }
     }
 }

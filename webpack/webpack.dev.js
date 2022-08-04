@@ -13,12 +13,13 @@ module.exports = merge(common, {
             'Access-Control-Allow-Methods': '*',
             'Access-Control-Allow-Headers': '*'
         },
-        proxy: {
-            '/socket': 'http://localhost:3000',
-            ws: true,
-        },
+        // url: 'https://cryptic-dusk-84195.herokuapp.com',
+        // proxy: {
+        //     '/socket': 'https://cryptic-dusk-84195.herokuapp.com',
+        //     ws: true,
+        // },
         compress: true,
-        port: 3000,
+        port: 8080,
         open: true,
         hot: true,
         static: {

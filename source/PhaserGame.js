@@ -16,16 +16,20 @@ function addPlayer(self, playerInfo, wallsLayer) {
   self.fauna.setKnives(self.knives);
   self.fauna.playerId = playerInfo.playerId;
   self.physics.add.collider(self.fauna, wallsLayer, self.handlePlayerWallsColision, undefined, self);
+  self.physics.add.collider(self.fauna, self.otherPlayers, self.handlePlayersCollision, undefined, self);
   self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
+  console.log('current: ', self.fauna.body.offset.x)
   return self.fauna;
 }
 
 function addOtherPlayers(self, playerInfo, wallsLayer) {
   const otherPlayer = self.add.fauna(playerInfo.x, playerInfo.y, 'fauna');
   self.physics.add.collider(otherPlayer, wallsLayer, self.handlePlayerWallsColision, undefined, self);
+  self.physics.add.collider(otherPlayer, self.fauna, self.handlePlayersCollision, undefined, self);
   self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers = self.otherPlayers.add(otherPlayer);
+  console.log('otherPlayer: ', otherPlayer.body.offset.x)
 }
 
 export default class PlayGame extends Phaser.Scene {
@@ -51,10 +55,7 @@ export default class PlayGame extends Phaser.Scene {
     wallsLayer.setCollisionByProperty({ collides: true });
     this.otherPlayers = this.physics.add.group();
 
-    this.socket = io();
-    // this.socket.on('connect', () => {
-    //   console.log('Connected: ', this.socket.id)
-    // });
+    this.socket = io('https://socket-server-likeavenus.herokuapp.com/');
     this.socket.on('current_players', (players) => {
       Object.keys(players).forEach((id) => {
         if (players[id].playerId === this.socket.id) {
@@ -80,11 +81,11 @@ export default class PlayGame extends Phaser.Scene {
     this.socket.on('update_positions', (player) => {
       this.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (player.playerId === otherPlayer.playerId) {
-          console.log('player: ', player)
           otherPlayer.x = player.x;
           otherPlayer.y = player.y;
-          otherPlayer.scaleX = player.scaleX;
-          console.log('otherPlayer: ', otherPlayer)
+          otherPlayer.setVelocity(player.velocity.x, player.velocity.y);
+          // otherPlayer.scaleX = player.scaleX;
+          // otherPlayer.body.offset.x = player.offsetX;
           otherPlayer.anims.play(player.animationKey, true);
         }
       });
@@ -119,7 +120,6 @@ export default class PlayGame extends Phaser.Scene {
     this.physics.add.collider(this.lizards, wallsLayer);
     this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
     this.physics.add.collider(this.knives, this.lizards, this.handleKnifeLizardCollision, undefined, this);
-
   }
 
   handleKnifeLizardCollision(obj1, obj2) {
@@ -136,6 +136,11 @@ export default class PlayGame extends Phaser.Scene {
     parts[1] = 'idle';
     this.fauna.anims.play(parts.join('-'));
     this.fauna.setVelocity(0, 0);
+  }
+
+  handlePlayersCollision(obj1, obj2) {
+    obj1.setVelocity(0, 0);
+    obj2.setVelocity(0, 0);
   }
 
   handlePlayerLizardCollision(_, obj2) {
