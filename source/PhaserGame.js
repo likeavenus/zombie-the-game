@@ -8,8 +8,6 @@ import { sceneEvents } from './components/App/events/EventCenter';
 import { io } from 'socket.io-client';
 import './components/App/characters/Fauna';
 
-// const socket = io();
-
 function addPlayer(self, playerInfo, wallsLayer) {
   self.fauna = self.add.fauna(playerInfo.x, playerInfo.y, 'fauna');
   self.cameras.main.startFollow(self.fauna, true);
@@ -18,7 +16,6 @@ function addPlayer(self, playerInfo, wallsLayer) {
   self.physics.add.collider(self.fauna, wallsLayer, self.handlePlayerWallsColision, undefined, self);
   self.physics.add.collider(self.fauna, self.otherPlayers, self.handlePlayersCollision, undefined, self);
   self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
-  console.log('current: ', self.fauna.body.offset.x)
   return self.fauna;
 }
 
@@ -29,7 +26,6 @@ function addOtherPlayers(self, playerInfo, wallsLayer) {
   self.playerLizardsCollider = self.physics.add.collider(self.lizards, self.fauna, self.handlePlayerLizardCollision, undefined, self);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers = self.otherPlayers.add(otherPlayer);
-  console.log('otherPlayer: ', otherPlayer.body.offset.x)
 }
 
 export default class PlayGame extends Phaser.Scene {
@@ -55,7 +51,8 @@ export default class PlayGame extends Phaser.Scene {
     wallsLayer.setCollisionByProperty({ collides: true });
     this.otherPlayers = this.physics.add.group();
 
-    this.socket = io('https://socket-server-likeavenus.herokuapp.com/');
+    this.socket = io('https://socket-server-one.vercel.app/');
+    // this.socket = io('http://localhost:8081/');
     this.socket.on('current_players', (players) => {
       Object.keys(players).forEach((id) => {
         if (players[id].playerId === this.socket.id) {
@@ -115,8 +112,7 @@ export default class PlayGame extends Phaser.Scene {
           lizGo.body.onCollide = true;
         },
     });
-
-    // this.lizards.get(226, 128, 'lizard');
+    this.lizards.get(326, 128, 'lizard')
     this.physics.add.collider(this.lizards, wallsLayer);
     this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
     this.physics.add.collider(this.knives, this.lizards, this.handleKnifeLizardCollision, undefined, this);

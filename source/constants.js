@@ -6,14 +6,14 @@ import GameUI from './GameUI';
 export const config = {
   type: Phaser.AUTO,
   parent: 'phaser',
-  width: 400,
-  height: 250,
+  width: 600,
+  height: 600,
   scene: [Preloader, PlayGame, GameUI],
   pixelArt: true,
   physics: {
     default: 'arcade',
     arcade: {
-      debug: true,
+      // debug: true,
       gravity: { y: 0, x: 0 }
     },
   },
