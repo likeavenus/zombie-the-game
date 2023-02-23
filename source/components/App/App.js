@@ -5,7 +5,7 @@ import { Router, Route, Switch } from 'react-router-dom';
 const history = createBrowserHistory();
 import ScrollToTop from 'react-router-scroll-top';
 
-export default function App(props) {
+export default function App() {
 
     return (
         <div className={styles.app}>
