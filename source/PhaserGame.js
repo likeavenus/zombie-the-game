@@ -58,6 +58,10 @@ export default class PlayGame extends Phaser.Scene {
     });
 
     this.lizards.get(226, 128, 'lizard');
+    this.lizards.get(100, 128, 'lizard');
+    this.lizards.get(400, 200, 'lizard');
+
+
     this.physics.add.collider(this.fauna, wallsLayer, this.handlePlayerWallsColision, undefined, this);
     this.physics.add.collider(this.lizards, wallsLayer);
     this.physics.add.collider(this.knives, wallsLayer, this.handleKnifeWallCollision, undefined, this);
